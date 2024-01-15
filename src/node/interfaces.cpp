@@ -715,6 +715,7 @@ public:
         if (!m_node.mempool) return CFeeRate{DUST_RELAY_TX_FEE};
         return m_node.mempool->m_dust_relay_feerate;
     }
+    bool isLoadingBlocks() override { return chainman().m_blockman.LoadingBlocks(); }
     bool isReadyToBroadcast() override { return !chainman().m_blockman.LoadingBlocks() && !isInitialBlockDownload(); }
     bool isInitialBlockDownload() override
     {

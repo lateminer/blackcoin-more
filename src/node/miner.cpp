@@ -225,9 +225,6 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     static int64_t nLastCoinStakeSearchTime = GetAdjustedTimeSeconds();  // only initialized at startup
 
     if (pwallet) {
-        // flush orphaned coinstakes
-        pwallet->AbandonOrphanedCoinstakes();
-
         // attempt to find a coinstake
         *pfPoSCancel = true;
         pblock->nBits = GetNextTargetRequired(pindexPrev, chainparams.GetConsensus(), true);
@@ -676,6 +673,9 @@ void PoSMiner(wallet::CWallet *pwallet)
                 if (!SleepStaker(pwallet, 10000))
                     return;
             }
+
+            if (pwallet->fCleanCoinStake)
+                return;
 
             //
             // Create new block

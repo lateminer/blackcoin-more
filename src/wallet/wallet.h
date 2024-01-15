@@ -3,6 +3,9 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+// Clean coinstake by Qtum
+// Copyright (c) 2016-2023 The Qtum developers
+
 #ifndef BITCOIN_WALLET_WALLET_H
 #define BITCOIN_WALLET_WALLET_H
 
@@ -305,7 +308,7 @@ private:
     void AddToSpends(const COutPoint& outpoint, const uint256& wtxid, WalletBatch* batch = nullptr) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
     void AddToSpends(const CWalletTx& wtx, WalletBatch* batch = nullptr) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
     void RemoveFromSpends(const COutPoint& outpoint, const uint256& wtxid) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
-    void RemoveFromSpends(const uint256& wtxid) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
+    void RemoveFromSpends(const CWalletTx& wtx) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 
     /**
      * Add a transaction to the wallet, or update it.  confirm.block_* should
@@ -758,11 +761,8 @@ public:
     //! get the current wallet format (the oldest client version guaranteed to understand this wallet)
     int GetVersion() const { LOCK(cs_wallet); return nWalletVersion; }
 
-    // TEMP: Blackcoin ToDo: enable/disable!
-    /*
     //! disable transaction for coinstake
     void DisableTransaction(const CTransaction &tx);
-    */
 
     //! Get wallet transactions that conflict with given transaction (spend same outputs)
     std::set<uint256> GetConflicts(const uint256& txid) const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
@@ -836,9 +836,6 @@ public:
 
     /* Returns true if the wallet can give out new addresses. This means it has keys in the keypool or can generate new keys */
     bool CanGetAddresses(bool internal = false) const;
-
-    /* Function that will remove potentially abandoned coinstakes, returning the input to the wallet. */
-    void AbandonOrphanedCoinstakes();
 
     /**
      * Blocks until the wallet state is up-to-date to /at least/ the current
@@ -974,12 +971,6 @@ public:
     //! Add a descriptor to the wallet, return a ScriptPubKeyMan & associated output type
     ScriptPubKeyMan* AddWalletDescriptor(WalletDescriptor& desc, const FlatSigningProvider& signing_provider, const std::string& label, bool internal) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 
-    // TEMP: Blackcoin ToDo: enable/disable!
-    /*
-    //! Clean coinstake transactions
-    void CleanCoinStake();
-    */
-
     /** Move all records from the BDB database to a new SQLite database for storage.
      * The original BDB file will be deleted and replaced with a new SQLite file.
      * A backup is not created.
@@ -1003,8 +994,16 @@ public:
     /* Is staking closing */
     bool IsStakeClosing();
 
+    /* Clean coinstake transactions */
+    void CleanCoinStake();
+
+    /* Clean coinstake transactions when not reindex and not importing */
+    void TryCleanCoinStake();
+
     /* Staking thread group */
     std::unique_ptr<std::vector<std::thread>> threadStakeMinerGroup;
+
+    std::atomic<bool> fCleanCoinStake = true;
 
     //! Whether the (external) signer performs R-value signature grinding
     bool CanGrindR() const;

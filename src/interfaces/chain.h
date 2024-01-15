@@ -239,6 +239,9 @@ public:
     //! Relay dust fee setting (-dustrelayfee), reflecting lowest rate it's economical to spend.
     virtual CFeeRate relayDustFee() = 0;
 
+    //! Is loading blocks.
+    virtual bool isLoadingBlocks() = 0;
+
     //! Check if the node is ready to broadcast transactions.
     virtual bool isReadyToBroadcast() = 0;
 
