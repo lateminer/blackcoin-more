@@ -62,11 +62,9 @@
 
 #include <boost/signals2/signal.hpp>
 
-#ifdef ENABLE_WALLET
 #include <wallet/rpc/staking.h>
 #include <wallet/staking.h>
 #include <node/miner.h>
-#endif
 
 using interfaces::BlockTip;
 using interfaces::Chain;
@@ -838,8 +836,6 @@ public:
     {
         return Assert(m_node.connman) ? m_node.connman->GetNodeCount(flags) : 0;
     }
-
-#ifdef ENABLE_WALLET
     void startStake(wallet::CWallet& wallet) override
     {
         if (node::CanStake()) {
@@ -854,11 +850,6 @@ public:
     {
         return GetStakeWeight(wallet);
     }
-    Span<const CRPCCommand> getStakingRPCCommands() override
-    {
-        return wallet::GetStakingRPCCommands();
-    }
-#endif
     
     bool hasAssumedValidChain() override
     {

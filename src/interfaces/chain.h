@@ -39,11 +39,9 @@ class CTxMemPool;
 class CBlockIndex;
 class CCoinsViewCache;
 
-#ifdef ENABLE_WALLET
 namespace wallet {
 class CWallet;
 } // namespace wallet
-#endif
 
 namespace interfaces {
 
@@ -374,7 +372,6 @@ public:
     //! Get number of connections.
     virtual size_t getNodeCount(ConnectionDirection flags) = 0;
 
-#ifdef ENABLE_WALLET
     //! Start staking.
     virtual void startStake(wallet::CWallet& wallet) = 0;
 
@@ -383,10 +380,6 @@ public:
 
     //! Get stake weight.
     virtual uint64_t getStakeWeight(const wallet::CWallet& wallet) = 0;
-
-    //! Get staking RPC commands.
-    virtual Span<const CRPCCommand> getStakingRPCCommands() = 0;
-#endif
 };
 
 //! Interface to let node manage chain clients (wallets, or maybe tools for
