@@ -9,7 +9,7 @@
  * network protocol versioning
  */
 
-static const int PROTOCOL_VERSION = 70016;
+static const int PROTOCOL_VERSION = 70017;
 
 //! peercoin: used to communicate with clients that don't know how to send PoS information in headers
 static const int OLD_VERSION = 70015;
